@@ -31,7 +31,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @RequestMapping("/video")
 public class VideoController {
 
-    // http://127.0.0.1:8080/hello?name=lisi
+    /**
+     * 下载一个视频
+     * @return 返回请求的视频经过封装后的可直接访问的链接
+     * @throws QiniuException
+     */
     @RequestMapping("/download")
     @ResponseBody
     public String download() throws QiniuException {
@@ -52,8 +56,7 @@ public class VideoController {
         String accessKey = "Zmp5QecX_NwwnBFKOAfOjmFVb15CIR2x4-jedmuQ";
         String secretKey = "HnuNUH9lumfXoFxXcrrelbucVkTXG5Hg00VxL9Sn";
         Auth auth = Auth.create(accessKey, secretKey);
-        String urlString = url.buildURL(auth, deadline);
-        System.out.println(urlString);
-        return urlString;
+        return url.buildURL(auth, deadline);
     }
+
 }
