@@ -55,12 +55,11 @@ public class VideoController {
      */
     @RequestMapping("/download")
     @ResponseBody
-    public String download() throws QiniuException {
+    public String download(@RequestParam String key) throws QiniuException {
         // domain   下载 domain, eg: qiniu.com【必须】
         // useHttps 是否使用 https【必须】
         // key      下载资源在七牛云存储的 key【必须】
         boolean useHttps = false;
-        String key = "1C319BD690097A1D186BAC68FB743B93.mp4";
         DownloadUrl url = new DownloadUrl(domain, useHttps, key);
 //        url.setAttname(attname) // 配置 attname
 //                .setFop(fop) // 配置 fop
