@@ -25,10 +25,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-@Controller
+@RestController
 @RequestMapping("/video")
 public class VideoController {
     @Value("${qiniuyun.domain}")
@@ -49,7 +50,6 @@ public class VideoController {
      * @throws QiniuException
      */
     @RequestMapping("/download")
-    @ResponseBody
     public String download(@RequestParam String key) throws QiniuException {
         return videoService.download(domain, false, key, 3600, accessKey, secretKey);
     }
@@ -59,7 +59,6 @@ public class VideoController {
      * @return 字符串列表，存放所有文件的key值
      */
     @RequestMapping("/listall")
-    @ResponseBody
     public List<String> listAll() {
         return videoService.listAll(Region.region2(), accessKey, secretKey, bucket, "", 1000, "");
     }
