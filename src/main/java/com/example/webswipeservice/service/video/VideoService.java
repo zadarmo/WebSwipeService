@@ -1,7 +1,8 @@
 package com.example.webswipeservice.service.video;
 
+import com.example.webswipeservice.constant.BucketsWebSwipeConstant;
+import com.example.webswipeservice.constant.UserConstant;
 import com.qiniu.common.QiniuException;
-import com.qiniu.storage.BucketManager;
 import com.qiniu.storage.Region;
 
 import java.util.List;
@@ -11,8 +12,8 @@ import java.util.List;
  */
 public interface VideoService {
     // 下载一个视频
-    String download(String domain, boolean useHttps, String key, long expireInSeconds, String accessKey, String secretKey) throws QiniuException;
+    String download(BucketsWebSwipeConstant bucketsWebSwipeConstant, UserConstant userConstant, boolean useHttps, String key, long expireInSeconds) throws QiniuException;
 
     // 列举空间文件列表
-    List<String> listAll(Region region, String accessKey, String secretKey, String bucket, String prefix, int limit, String delimiter);
+    List<String> listAll(BucketsWebSwipeConstant bucketsWebSwipeConstant, UserConstant userConstant, Region region, String prefix, int limit, String delimiter);
 }

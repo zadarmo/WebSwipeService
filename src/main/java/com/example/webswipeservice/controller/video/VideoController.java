@@ -16,15 +16,14 @@
 
 package com.example.webswipeservice.controller.video;
 
+import com.example.webswipeservice.constant.BucketsWebSwipeConstant;
+import com.example.webswipeservice.constant.UserConstant;
 import com.example.webswipeservice.service.video.VideoService;
 import com.qiniu.common.QiniuException;
 import com.qiniu.storage.Region;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -32,15 +31,10 @@ import java.util.List;
 @RestController
 @RequestMapping("/video")
 public class VideoController {
-    @Value("${qiniuyun.domain}")
-    private String domain;
-    @Value("${qiniuyun.bucket}")
-    private String bucket;
-    @Value("${qiniuyun.access-key}")
-    private String accessKey;
-    @Value("${qiniuyun.secret-key}")
-    private String secretKey;
-
+    @Autowired
+    UserConstant userConstant;
+    @Autowired
+    BucketsWebSwipeConstant bucketsWebSwipeConstant;
     @Autowired
     VideoService videoService;
 
@@ -51,7 +45,7 @@ public class VideoController {
      */
     @RequestMapping("/download")
     public String download(@RequestParam String key) throws QiniuException {
-        return videoService.download(domain, false, key, 3600, accessKey, secretKey);
+        return videoService.download(bucketsWebSwipeConstant, userConstant, false, key, 3600);
     }
 
     /**
@@ -60,6 +54,6 @@ public class VideoController {
      */
     @RequestMapping("/listall")
     public List<String> listAll() {
-        return videoService.listAll(Region.region2(), accessKey, secretKey, bucket, "", 1000, "");
+        return videoService.listAll(bucketsWebSwipeConstant, userConstant, Region.region2(), "", 1000, "");
     }
 }

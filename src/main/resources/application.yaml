@@ -6,9 +6,12 @@ spring:
     password: 123456
 server:
   port: 8080
-  
-qiniuyun:
-  domain: s35106op1.hn-bkt.clouddn.com
-  bucket: web-swipe
+
+qly-user:
   access-key: Zmp5QecX_NwwnBFKOAfOjmFVb15CIR2x4-jedmuQ
   secret-key: HnuNUH9lumfXoFxXcrrelbucVkTXG5Hg00VxL9Sn
+
+qly-buckets:
+  web-swipe:
+    domain: s35106op1.hn-bkt.clouddn.com
+    bucket: web-swipe
