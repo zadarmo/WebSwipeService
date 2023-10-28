@@ -16,8 +16,6 @@
 
 package com.example.webswipeservice.controller.video;
 
-import com.example.webswipeservice.constant.BucketsWebSwipeConstant;
-import com.example.webswipeservice.constant.UserConstant;
 import com.example.webswipeservice.service.video.VideoService;
 import com.qiniu.common.QiniuException;
 import com.qiniu.storage.Region;
@@ -32,10 +30,6 @@ import java.util.List;
 @RequestMapping("/video")
 public class VideoController {
     @Autowired
-    UserConstant userConstant;
-    @Autowired
-    BucketsWebSwipeConstant bucketsWebSwipeConstant;
-    @Autowired
     VideoService videoService;
 
     /**
@@ -45,7 +39,7 @@ public class VideoController {
      */
     @RequestMapping("/download")
     public String download(@RequestParam String key) throws QiniuException {
-        return videoService.download(bucketsWebSwipeConstant, userConstant, false, key, 3600);
+        return videoService.download(key);
     }
 
     /**
@@ -54,6 +48,6 @@ public class VideoController {
      */
     @RequestMapping("/listall")
     public List<String> listAll() {
-        return videoService.listAll(bucketsWebSwipeConstant, userConstant, Region.region2(), "", 1000, "");
+        return videoService.listAll();
     }
 }
