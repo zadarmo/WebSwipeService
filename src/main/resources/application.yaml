@@ -15,3 +15,6 @@ qly-buckets:
   web-swipe:
     domain: s35106op1.hn-bkt.clouddn.com
     bucket: web-swipe
+  web-swipe-video-cover:
+    domain: s36e5ap9p.hn-bkt.clouddn.com
+    bucket: web-swipe-video-cover

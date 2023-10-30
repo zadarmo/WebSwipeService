@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -49,5 +50,19 @@ public class VideoController {
     @RequestMapping("/listall")
     public List<String> listAll() {
         return videoService.listAll();
+    }
+
+    /**
+     * 查询单个标签的视频列表
+     * @return VideoInfo列表
+     */
+    @RequestMapping("/list")
+    public Object list(@RequestParam(required = false) String tag) throws QiniuException {
+        if (tag == null) {
+            // TODO
+            return videoService.list("热门");
+        } else {
+            return videoService.list(tag);
+        }
     }
 }

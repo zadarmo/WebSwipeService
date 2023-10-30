@@ -1,5 +1,8 @@
 package com.example.webswipeservice.service.video.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.example.webswipeservice.mapper.video.VideoMapper;
+import com.example.webswipeservice.modal.video.VideoInfo;
 import com.example.webswipeservice.service.video.VideoService;
 import com.example.webswipeservice.tools.VideoTool;
 import com.qiniu.common.QiniuException;
@@ -8,6 +11,7 @@ import com.qiniu.storage.Configuration;
 import com.qiniu.storage.Region;
 import com.qiniu.storage.model.FileInfo;
 import com.qiniu.util.Auth;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -17,20 +21,27 @@ import java.util.List;
 @Service
 public class VideoServiceImpl implements VideoService {
 
+    @Autowired
+    VideoMapper videoMapper;
+
     @Value("${qly-user.access-key}")
     String accessKey;
     @Value("${qly-user.secret-key}")
     String secretKey;
 
     @Value("${qly-buckets.web-swipe.domain}")
-    String domain;
+    String webSwipeDomain;
     @Value("${qly-buckets.web-swipe.bucket}")
-    String bucket;
+    String webSwipeBucket;
+    @Value("${qly-buckets.web-swipe-video-cover.domain}")
+    String webSwipeVideoCoverDomain;
+    @Value("${qly-buckets.web-swipe-video-cover.bucket}")
+    String webSwipeVideoCoverBucket;
 
     @Override
     public String download(String key) throws QiniuException {
         long expireInSeconds = 3600;
-        return VideoTool.downloadVideoFromQly(domain, false, key, expireInSeconds, accessKey, secretKey);
+        return VideoTool.buildQlySrcUrl(webSwipeDomain, false, key, expireInSeconds, accessKey, secretKey);
     }
 
     @Override
@@ -47,7 +58,7 @@ public class VideoServiceImpl implements VideoService {
         BucketManager bucketManager = new BucketManager(auth, cfg);
 
         //列举空间文件列表
-        BucketManager.FileListIterator fileListIterator = bucketManager.createFileListIterator(bucket, prefix, limit, delimiter);
+        BucketManager.FileListIterator fileListIterator = bucketManager.createFileListIterator(webSwipeBucket, prefix, limit, delimiter);
         List<String> keyList = new ArrayList<>();
         while (fileListIterator.hasNext()) {
             //处理获取的file list结果
@@ -59,5 +70,21 @@ public class VideoServiceImpl implements VideoService {
         return keyList;
     }
 
+    public List<VideoInfo> list(String tag) throws QiniuException {
+        long expireInSeconds = 3600;
 
+        // 从数据库中查询满足tags字段包含tag的数据
+        QueryWrapper<VideoInfo> queryMapper = new QueryWrapper<>();
+        queryMapper.like("tags", tag);
+        List<VideoInfo> videoInfos = videoMapper.selectList(queryMapper);
+
+        // 构建资源外链
+        for (VideoInfo videoInfo : videoInfos) {
+            String videoUrl = VideoTool.buildQlySrcUrl(webSwipeDomain, false, videoInfo.getVideoKey(), expireInSeconds, accessKey, secretKey);
+            String coverUrl = VideoTool.buildQlySrcUrl(webSwipeVideoCoverDomain, false, videoInfo.getCoverKey(), expireInSeconds, accessKey, secretKey);
+            videoInfo.setVideoUrl(videoUrl);
+            videoInfo.setCoverUrl(coverUrl);
+        }
+        return videoInfos;
+    }
 }
