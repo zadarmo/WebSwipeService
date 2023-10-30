@@ -21,7 +21,7 @@ class UserInfoTests {
         userInfo.setUsername("bbb");
         userInfo.setPassword("ccc");
         userInfo.setAge(20);
-        userInfo.setSex(EnumSex.FEMALE);
+        userInfo.setSex(EnumSex.female);
 
         Integer result = userInfoMapper.insert(userInfo);
         // 检测插入用户的id
