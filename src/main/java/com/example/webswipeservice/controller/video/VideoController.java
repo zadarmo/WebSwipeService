@@ -16,6 +16,8 @@
 
 package com.example.webswipeservice.controller.video;
 
+import com.example.webswipeservice.network.BaseResponse;
+import com.example.webswipeservice.network.ResultUtils;
 import com.example.webswipeservice.service.video.VideoService;
 import com.qiniu.common.QiniuException;
 import com.qiniu.storage.Region;
@@ -40,8 +42,8 @@ public class VideoController {
      * @throws QiniuException
      */
     @RequestMapping("/download")
-    public String download(@RequestParam String key) throws QiniuException {
-        return videoService.download(key);
+    public BaseResponse<String> download(@RequestParam String key) throws QiniuException {
+        return ResultUtils.success("success", videoService.download(key));
     }
 
     /**
@@ -49,8 +51,8 @@ public class VideoController {
      * @return 字符串列表，存放所有文件的key值
      */
     @RequestMapping("/listall")
-    public List<String> listAll() {
-        return videoService.listAll();
+    public BaseResponse<List<String>> listAll() {
+        return ResultUtils.success("success", videoService.listAll());
     }
 
     /**
@@ -58,12 +60,12 @@ public class VideoController {
      * @return VideoInfo列表
      */
     @RequestMapping("/list")
-    public Object list(@RequestParam(required = false) String tag) throws QiniuException {
+    public BaseResponse<Object> list(@RequestParam(required = false) String tag) throws QiniuException {
         if (tag == null) {
             // TODO
-            return videoService.list("热门");
+            return ResultUtils.success("success", videoService.list("热门"));
         } else {
-            return videoService.list(tag);
+            return ResultUtils.success("success", videoService.list(tag));
         }
     }
 
@@ -72,7 +74,7 @@ public class VideoController {
      * @return VideoInfo列表
      */
     @RequestMapping("/listtags")
-    public List<String> listtags()  {
-        return videoService.listTags();
+    public BaseResponse<List<String>> listtags()  {
+        return ResultUtils.success("success", videoService.listTags());
     }
 }
