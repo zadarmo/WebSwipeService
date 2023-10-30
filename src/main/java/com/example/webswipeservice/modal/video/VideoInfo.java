@@ -32,10 +32,15 @@ public class VideoInfo {
     private String videoUrl;
     @TableField(exist = false)
     private String coverUrl;
+    @TableField(exist = false)
+    private String username;
     public void setVideoUrl(String url) {
         this.videoUrl = url;
     }
     public void setCoverUrl(String url) {
         this.coverUrl = url;
+    }
+    public void setUsername(String username) {
+        this.username = username;
     }
 }

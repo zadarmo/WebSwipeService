@@ -1,7 +1,9 @@
 package com.example.webswipeservice.service.video.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.example.webswipeservice.mapper.user.UserInfoMapper;
 import com.example.webswipeservice.mapper.video.VideoMapper;
+import com.example.webswipeservice.modal.user.UserInfo;
 import com.example.webswipeservice.modal.video.VideoInfo;
 import com.example.webswipeservice.service.video.VideoService;
 import com.example.webswipeservice.tools.VideoTool;
@@ -22,6 +24,8 @@ public class VideoServiceImpl implements VideoService {
 
     @Autowired
     VideoMapper videoMapper;
+    @Autowired
+    UserInfoMapper userInfoMapper;
 
     @Value("${qly-user.access-key}")
     String accessKey;
@@ -83,7 +87,13 @@ public class VideoServiceImpl implements VideoService {
             String coverUrl = VideoTool.buildQlySrcUrl(webSwipeVideoCoverDomain, false, videoInfo.getCoverKey(), expireInSeconds, accessKey, secretKey);
             videoInfo.setVideoUrl(videoUrl);
             videoInfo.setCoverUrl(coverUrl);
+
+            // 查询用户名
+            System.out.println(videoInfo.getUploaderId());
+            UserInfo userInfo = userInfoMapper.selectById(videoInfo.getUploaderId());
+            videoInfo.setUsername(userInfo.getUsername());
         }
+
         return videoInfos;
     }
 
