@@ -15,8 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class VideoServiceImpl implements VideoService {
@@ -86,5 +85,25 @@ public class VideoServiceImpl implements VideoService {
             videoInfo.setCoverUrl(coverUrl);
         }
         return videoInfos;
+    }
+
+    @Override
+    public List<String> listTags() {
+        // 查询所有视频数据
+        Set<String> tagSet = new HashSet<>();
+        List<VideoInfo> videoInfos = videoMapper.selectList(null);
+
+        // 分割tags字段，存入set
+        for(VideoInfo videoInfo : videoInfos) {
+            String tags = videoInfo.getTags();
+            String[] tagArr = tags.split(",");
+            tagSet.addAll(Arrays.asList(tagArr));
+        }
+
+        // 添加“热门”分类
+        List<String> tagList = new ArrayList<>();
+        tagList.add("热门");
+        tagList.addAll(tagSet);
+        return tagList;
     }
 }

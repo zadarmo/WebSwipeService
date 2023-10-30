@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/video")
@@ -64,5 +65,14 @@ public class VideoController {
         } else {
             return videoService.list(tag);
         }
+    }
+
+    /**
+     * 查询所有视频标签
+     * @return VideoInfo列表
+     */
+    @RequestMapping("/listtags")
+    public List<String> listtags()  {
+        return videoService.listTags();
     }
 }

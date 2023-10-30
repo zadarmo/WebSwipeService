@@ -5,6 +5,7 @@ import com.qiniu.common.QiniuException;
 import com.qiniu.storage.Region;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * 七牛云视频service
@@ -18,4 +19,7 @@ public interface VideoService {
 
     // 查询单个标签的视频列表
     List<VideoInfo> list(String tag) throws QiniuException;
+
+    // 查询所有视频标签
+    List<String> listTags();
 }
