@@ -1,5 +1,6 @@
 package com.example.webswipeservice.service.video;
 
+import com.example.webswipeservice.modal.video.CategoryInfo;
 import com.example.webswipeservice.modal.video.VideoInfo;
 import com.qiniu.common.QiniuException;
 
@@ -19,5 +20,5 @@ public interface VideoInfoService {
     List<VideoInfo> list(String tag) throws QiniuException;
 
     // 查询所有视频标签
-    List<String> listTags();
+    List<CategoryInfo> listTags();
 }

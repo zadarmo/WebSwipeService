@@ -16,6 +16,7 @@
 
 package com.example.webswipeservice.controller.video;
 
+import com.example.webswipeservice.modal.video.CategoryInfo;
 import com.example.webswipeservice.network.BaseResponse;
 import com.example.webswipeservice.network.ResultUtils;
 import com.example.webswipeservice.service.video.VideoInfoService;
@@ -71,7 +72,7 @@ public class VideoController {
      * @return VideoInfo列表
      */
     @RequestMapping("/listtags")
-    public BaseResponse<List<String>> listtags()  {
+    public BaseResponse<List<CategoryInfo>> listtags()  {
         return ResultUtils.success("success", videoService.listTags());
     }
 }

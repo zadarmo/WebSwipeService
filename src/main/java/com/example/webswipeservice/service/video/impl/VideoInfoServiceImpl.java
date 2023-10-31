@@ -2,8 +2,10 @@ package com.example.webswipeservice.service.video.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.example.webswipeservice.mapper.user.UserInfoMapper;
+import com.example.webswipeservice.mapper.video.CategoryInfoMapper;
 import com.example.webswipeservice.mapper.video.VideoInfoMapper;
 import com.example.webswipeservice.modal.user.UserInfo;
+import com.example.webswipeservice.modal.video.CategoryInfo;
 import com.example.webswipeservice.modal.video.VideoInfo;
 import com.example.webswipeservice.service.video.VideoInfoService;
 import com.example.webswipeservice.tools.VideoTool;
@@ -26,6 +28,8 @@ public class VideoInfoServiceImpl implements VideoInfoService {
     VideoInfoMapper videoMapper;
     @Autowired
     UserInfoMapper userInfoMapper;
+    @Autowired
+    CategoryInfoMapper categoryInfoMapper;
 
     @Value("${qly-user.access-key}")
     String accessKey;
@@ -98,22 +102,7 @@ public class VideoInfoServiceImpl implements VideoInfoService {
     }
 
     @Override
-    public List<String> listTags() {
-        // 查询所有视频数据
-        Set<String> tagSet = new HashSet<>();
-        List<VideoInfo> videoInfos = videoMapper.selectList(null);
-
-        // 分割tags字段，存入set
-        for(VideoInfo videoInfo : videoInfos) {
-            String tags = videoInfo.getTags();
-            String[] tagArr = tags.split(",");
-            tagSet.addAll(Arrays.asList(tagArr));
-        }
-
-        // 添加“热门”分类
-        List<String> tagList = new ArrayList<>();
-        tagList.add("热门");
-        tagList.addAll(tagSet);
-        return tagList;
+    public List<CategoryInfo> listTags() {
+        return categoryInfoMapper.selectList(null);
     }
 }
