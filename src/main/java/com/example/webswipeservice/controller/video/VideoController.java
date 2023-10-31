@@ -58,21 +58,21 @@ public class VideoController {
      * @return VideoInfo列表
      */
     @RequestMapping("/list")
-    public BaseResponse<Object> list(@RequestParam(required = false) String tag) throws QiniuException {
-        if (tag == null) {
+    public BaseResponse<Object> list(@RequestParam(required = false) String category) throws QiniuException {
+        if (category == null) {
             // TODO
-            return ResultUtils.success("success", videoService.list("热门"));
+            return ResultUtils.success("success", videoService.list("popular"));
         } else {
-            return ResultUtils.success("success", videoService.list(tag));
+            return ResultUtils.success("success", videoService.list(category));
         }
     }
 
     /**
-     * 查询所有视频标签
-     * @return VideoInfo列表
+     * 查询所有视频类别
+     * @return CategoryInfo列表
      */
-    @RequestMapping("/listtags")
-    public BaseResponse<List<CategoryInfo>> listtags()  {
-        return ResultUtils.success("success", videoService.listTags());
+    @RequestMapping("/listcategories")
+    public BaseResponse<List<CategoryInfo>> listCategories()  {
+        return ResultUtils.success("success", videoService.listCategories());
     }
 }

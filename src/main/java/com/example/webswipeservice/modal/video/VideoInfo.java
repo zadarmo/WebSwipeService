@@ -25,7 +25,7 @@ public class VideoInfo {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Date createAt;
     private double duration;
-    private String tags;
+    private String categories;
     private String description;
 
     @TableField(exist = false)

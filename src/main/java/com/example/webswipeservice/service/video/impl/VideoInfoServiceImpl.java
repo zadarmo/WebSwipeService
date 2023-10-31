@@ -77,12 +77,12 @@ public class VideoInfoServiceImpl implements VideoInfoService {
         return keyList;
     }
 
-    public List<VideoInfo> list(String tag) throws QiniuException {
+    public List<VideoInfo> list(String category) throws QiniuException {
         long expireInSeconds = 3600;
 
         // 从数据库中查询满足tags字段包含tag的数据
         QueryWrapper<VideoInfo> queryMapper = new QueryWrapper<>();
-        queryMapper.like("tags", tag);
+        queryMapper.like("categories", category);
         List<VideoInfo> videoInfos = videoMapper.selectList(queryMapper);
 
         // 构建资源外链
@@ -93,7 +93,6 @@ public class VideoInfoServiceImpl implements VideoInfoService {
             videoInfo.setCoverUrl(coverUrl);
 
             // 查询用户名
-            System.out.println(videoInfo.getUploaderId());
             UserInfo userInfo = userInfoMapper.selectById(videoInfo.getUploaderId());
             videoInfo.setUsername(userInfo.getUsername());
         }
@@ -102,7 +101,7 @@ public class VideoInfoServiceImpl implements VideoInfoService {
     }
 
     @Override
-    public List<CategoryInfo> listTags() {
+    public List<CategoryInfo> listCategories() {
         return categoryInfoMapper.selectList(null);
     }
 }

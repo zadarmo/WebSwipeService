@@ -17,8 +17,8 @@ public interface VideoInfoService {
     List<String> listAll();
 
     // 查询单个标签的视频列表
-    List<VideoInfo> list(String tag) throws QiniuException;
+    List<VideoInfo> list(String category) throws QiniuException;
 
-    // 查询所有视频标签
-    List<CategoryInfo> listTags();
+    // 查询所有视频类别
+    List<CategoryInfo> listCategories();
 }
