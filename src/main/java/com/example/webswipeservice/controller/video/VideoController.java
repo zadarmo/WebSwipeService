@@ -18,23 +18,20 @@ package com.example.webswipeservice.controller.video;
 
 import com.example.webswipeservice.network.BaseResponse;
 import com.example.webswipeservice.network.ResultUtils;
-import com.example.webswipeservice.service.video.VideoService;
+import com.example.webswipeservice.service.video.VideoInfoService;
 import com.qiniu.common.QiniuException;
-import com.qiniu.storage.Region;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 @RestController
 @RequestMapping("/video")
 public class VideoController {
     @Autowired
-    VideoService videoService;
+    VideoInfoService videoService;
 
     /**
      * 下载一个视频

@@ -2,15 +2,13 @@ package com.example.webswipeservice.service.video;
 
 import com.example.webswipeservice.modal.video.VideoInfo;
 import com.qiniu.common.QiniuException;
-import com.qiniu.storage.Region;
 
 import java.util.List;
-import java.util.Set;
 
 /**
  * 七牛云视频service
  */
-public interface VideoService {
+public interface VideoInfoService {
     // 下载一个视频
     String download(String key) throws QiniuException;
 

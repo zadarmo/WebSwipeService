@@ -2,10 +2,10 @@ package com.example.webswipeservice.service.video.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.example.webswipeservice.mapper.user.UserInfoMapper;
-import com.example.webswipeservice.mapper.video.VideoMapper;
+import com.example.webswipeservice.mapper.video.VideoInfoMapper;
 import com.example.webswipeservice.modal.user.UserInfo;
 import com.example.webswipeservice.modal.video.VideoInfo;
-import com.example.webswipeservice.service.video.VideoService;
+import com.example.webswipeservice.service.video.VideoInfoService;
 import com.example.webswipeservice.tools.VideoTool;
 import com.qiniu.common.QiniuException;
 import com.qiniu.storage.BucketManager;
@@ -20,10 +20,10 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 
 @Service
-public class VideoServiceImpl implements VideoService {
+public class VideoInfoServiceImpl implements VideoInfoService {
 
     @Autowired
-    VideoMapper videoMapper;
+    VideoInfoMapper videoMapper;
     @Autowired
     UserInfoMapper userInfoMapper;
 
