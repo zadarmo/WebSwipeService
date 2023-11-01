@@ -1,8 +1,16 @@
 package com.example.webswipeservice.tools;
 
 import com.qiniu.common.QiniuException;
+import com.qiniu.http.Response;
+import com.qiniu.storage.Configuration;
 import com.qiniu.storage.DownloadUrl;
+import com.qiniu.storage.Region;
+import com.qiniu.storage.UploadManager;
 import com.qiniu.util.Auth;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 
 public class VideoTool {
     /**
@@ -30,4 +38,25 @@ public class VideoTool {
         Auth auth = Auth.create(accessKey, secretKey);
         return url.buildURL(auth, deadline);
     }
+
+    public static Response uploadVideo2Qly(MultipartFile file, String bucket, String accessKey, String secretKey) {
+        //构造一个带指定 Region 对象的配置类
+        Configuration cfg = new Configuration(Region.region0());
+//        cfg.resumableUploadAPIVersion = Configuration.ResumableUploadAPIVersion.V2;// 指定分片上传版本
+
+        //...其他参数参考类注释
+        UploadManager uploadManager = new UploadManager(cfg);
+        //默认不指定key的情况下，以文件内容的hash值作为文件名
+        String key = null;
+        try {
+            byte[] uploadBytes = file.getBytes();
+            ByteArrayInputStream byteInputStream=new ByteArrayInputStream(uploadBytes);
+            Auth auth = Auth.create(accessKey, secretKey);
+            String upToken = auth.uploadToken(bucket);
+            return uploadManager.put(byteInputStream, key, upToken,null, null);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 }

@@ -1,8 +1,10 @@
 package com.example.webswipeservice.service.video;
 
 import com.example.webswipeservice.modal.video.CategoryInfo;
+import com.example.webswipeservice.modal.video.UploadedVideo;
 import com.example.webswipeservice.modal.video.VideoInfo;
 import com.qiniu.common.QiniuException;
+import com.qiniu.http.Response;
 
 import java.util.List;
 
@@ -21,4 +23,7 @@ public interface VideoInfoService {
 
     // 查询所有视频类别
     List<CategoryInfo> listCategories();
+
+    // 上传一个视频
+    Response uploadVideo(UploadedVideo uploadedVideo);
 }

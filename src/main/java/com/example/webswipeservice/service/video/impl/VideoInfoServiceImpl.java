@@ -6,10 +6,12 @@ import com.example.webswipeservice.mapper.video.CategoryInfoMapper;
 import com.example.webswipeservice.mapper.video.VideoInfoMapper;
 import com.example.webswipeservice.modal.user.UserInfo;
 import com.example.webswipeservice.modal.video.CategoryInfo;
+import com.example.webswipeservice.modal.video.UploadedVideo;
 import com.example.webswipeservice.modal.video.VideoInfo;
 import com.example.webswipeservice.service.video.VideoInfoService;
 import com.example.webswipeservice.tools.VideoTool;
 import com.qiniu.common.QiniuException;
+import com.qiniu.http.Response;
 import com.qiniu.storage.BucketManager;
 import com.qiniu.storage.Configuration;
 import com.qiniu.storage.Region;
@@ -103,5 +105,21 @@ public class VideoInfoServiceImpl implements VideoInfoService {
     @Override
     public List<CategoryInfo> listCategories() {
         return categoryInfoMapper.selectList(null);
+    }
+
+    public Response uploadVideo(UploadedVideo uploadedVideo) {
+        // 1. 保存视频数据到七牛云
+        Response response = VideoTool.uploadVideo2Qly(uploadedVideo.getFile(), webSwipeBucket, accessKey, secretKey);
+
+//        // 2. 调用七牛云接口，生成封面
+//        VideoTool.vframe();
+//
+//        // 3. 保存视频封面到web-swipe-cover-video空间
+//        VideoTool.uploadCover2Qly();
+//
+//        // 4. 生成VideoInfo对象，保存到数据库中
+//        VideoInfo videoInfo = new VideoInfo();
+
+        return response;
     }
 }

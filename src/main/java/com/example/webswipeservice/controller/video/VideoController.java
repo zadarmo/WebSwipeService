@@ -17,14 +17,14 @@
 package com.example.webswipeservice.controller.video;
 
 import com.example.webswipeservice.modal.video.CategoryInfo;
+import com.example.webswipeservice.modal.video.UploadedVideo;
 import com.example.webswipeservice.network.BaseResponse;
 import com.example.webswipeservice.network.ResultUtils;
 import com.example.webswipeservice.service.video.VideoInfoService;
 import com.qiniu.common.QiniuException;
+import com.qiniu.http.Response;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -74,5 +74,14 @@ public class VideoController {
     @RequestMapping("/listcategories")
     public BaseResponse<List<CategoryInfo>> listCategories()  {
         return ResultUtils.success("success", videoService.listCategories());
+    }
+
+    /**
+     * 上传一个视频
+     * @return CategoryInfo列表
+     */
+    @PostMapping("/upload")
+    public BaseResponse<Response> upload(@ModelAttribute UploadedVideo uploadedVideo)  {
+        return ResultUtils.success("success", videoService.uploadVideo(uploadedVideo));
     }
 }
