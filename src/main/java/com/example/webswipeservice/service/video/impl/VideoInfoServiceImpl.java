@@ -115,8 +115,6 @@ public class VideoInfoServiceImpl implements VideoInfoService {
     public void uploadVideo(UploadedVideo uploadedVideo) throws QiniuException {
         Date createAt = new Date();
 
-        uploadedVideo.setCoverOffset(1);
-
         // 1. 保存视频数据到七牛云
         Response response = VideoTool.uploadVideo2Qly(uploadedVideo.getFile(), videoBucket, accessKey, secretKey);
         DefaultPutRet putRet = new Gson().fromJson(response.bodyString(), DefaultPutRet.class);
