@@ -115,6 +115,8 @@ public class VideoInfoServiceImpl implements VideoInfoService {
     public void uploadVideo(UploadedVideo uploadedVideo) throws QiniuException {
         Date createAt = new Date();
 
+        uploadedVideo.setCoverOffset(1);
+
         // 1. 保存视频数据到七牛云
         Response response = VideoTool.uploadVideo2Qly(uploadedVideo.getFile(), videoBucket, accessKey, secretKey);
         DefaultPutRet putRet = new Gson().fromJson(response.bodyString(), DefaultPutRet.class);
@@ -122,18 +124,13 @@ public class VideoInfoServiceImpl implements VideoInfoService {
 
         // 2. 调用七牛云接口，生成封面并上传到web-swipe-cover-video空间
         // 根据videoKey生成coverKey
-        String coverKey = videoKey.split(".")[0] + "." + uploadedVideo.getCoverImgType();
+        String coverKey = videoKey;
         VideoTool.uploadCover2Qly(uploadedVideo, videoBucket, videoKey, accessKey, secretKey, coverBucket, coverKey, coverPipeline);
 
         // 3. 生成VideoInfo对象
         long uploaderId = 1;
         double duration = 1;
-        StringBuilder sb = new StringBuilder();
-        List<String> categories = uploadedVideo.getCategories();
-        sb.append(categories.get(0));
-        for(int i = 1; i < categories.size(); i ++ ) {
-            sb.append(",").append(categories.get(i));
-        }
+        String categories = uploadedVideo.getCategories();
 
         VideoInfo videoInfo = new VideoInfo();
         videoInfo.setVideoKey(videoKey);
@@ -141,7 +138,7 @@ public class VideoInfoServiceImpl implements VideoInfoService {
         videoInfo.setUploaderId(uploaderId);
         videoInfo.setCreateAt(createAt);
         videoInfo.setDuration(duration);
-        videoInfo.setCategories(sb.toString());
+        videoInfo.setCategories(categories);
         videoInfo.setDescription(uploadedVideo.getDescription());
 
         // 4. 保存到数据库中

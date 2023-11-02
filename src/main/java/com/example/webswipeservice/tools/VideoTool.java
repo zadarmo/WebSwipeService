@@ -44,6 +44,14 @@ public class VideoTool {
         return url.buildURL(auth, deadline);
     }
 
+    /**
+     * 上传视频到七牛云
+     * @param file
+     * @param bucket
+     * @param accessKey
+     * @param secretKey
+     * @return
+     */
     public static Response uploadVideo2Qly(MultipartFile file, String bucket, String accessKey, String secretKey) {
         //构造一个带指定 Region 对象的配置类
         Configuration cfg = new Configuration(Region.region2());
@@ -93,10 +101,11 @@ public class VideoTool {
         Configuration cfg = new Configuration(Region.region2());
         OperationManager operater = new OperationManager(auth, cfg);
         //设置转码操作参数
+        String coverImgType = uploadedVideo.getCoverImgType();
+        int coverOffset = uploadedVideo.getCoverOffset();
         int coverH = uploadedVideo.getCoverH();
         int coverW = uploadedVideo.getCoverW();
-        int coverOffset = uploadedVideo.getCoverOffset();
-        String coverImgType = uploadedVideo.getCoverImgType();
+        String coverRotate = "auto";
 
         // 拼接vframe接口字符串
         StringBuilder sb = new StringBuilder();
@@ -105,7 +114,7 @@ public class VideoTool {
                 .append("/offset/").append(coverOffset)
                 .append("/w/").append(coverW)
                 .append("/h/").append(coverH)
-                .append("/rotate/").append("0");
+                .append("/rotate/").append(coverRotate);
         String fops = sb.toString();
 
         //可以对转码后的文件进行使用saveas参数自定义命名，当然也可以不指定文件会默认命名并保存在当前空间。
@@ -115,7 +124,7 @@ public class VideoTool {
         StringMap params = new StringMap().putWhen("force", 1, true).putNotEmpty("pipeline", pipeline);
         try {
             String persistid = operater.pfop(videoBucket, videoKey, pfops, params);
-            //打印返回的persistid
+            //打印返回的persistid, 可用于查询持久化状态
             System.out.println(persistid);
         } catch (QiniuException e) {
             System.out.println(e.getMessage());
