@@ -13,13 +13,13 @@ import java.util.List;
 public class UploadedVideo {
     // 视频参数
     MultipartFile file;
-    List<String> categories;
+    String categories;
     String description;
     int isVertical;
 
     // 封面参数
-    int coverH;
-    int coverW;
-    String coverImgType;
-    int coverOffset;
+    int coverH = 500;
+    int coverW = 260;
+    String coverImgType = "png";
+    int coverOffset = 1;
 }
