@@ -112,8 +112,20 @@ public class VideoInfoServiceImpl implements VideoInfoService {
         return categoryInfoMapper.selectList(null);
     }
 
-    public void uploadVideo(UploadedVideo uploadedVideo) throws QiniuException {
+    public int uploadVideo(UploadedVideo uploadedVideo) throws QiniuException {
         Date createAt = new Date();
+        // 随机生成封面高度，并返回
+        int coverH = -1;
+        if (uploadedVideo.getIsVertical() == 0) {
+            int _min = 500;
+            int _max = 600;
+            coverH = (int)(Math.random() * (_max - _min + 1)) + _min;
+        } else {
+            int _min = 300;
+            int _max = 400;
+            coverH = (int)(Math.random() * (_max - _min + 1)) + _min;
+        }
+        uploadedVideo.setCoverH(coverH);
 
         // 1. 保存视频数据到七牛云
         Response response = VideoTool.uploadVideo2Qly(uploadedVideo.getFile(), videoBucket, accessKey, secretKey);
@@ -141,5 +153,8 @@ public class VideoInfoServiceImpl implements VideoInfoService {
 
         // 4. 保存到数据库中
         videoMapper.insert(videoInfo);
+
+        // 5. 返回封面高度
+        return coverH;
     }
 }

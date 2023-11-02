@@ -21,12 +21,15 @@ import com.example.webswipeservice.modal.video.UploadedVideo;
 import com.example.webswipeservice.network.BaseResponse;
 import com.example.webswipeservice.network.ResultUtils;
 import com.example.webswipeservice.service.video.VideoInfoService;
+import com.google.gson.JsonObject;
 import com.qiniu.common.QiniuException;
 import com.qiniu.http.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/video")
@@ -78,11 +81,13 @@ public class VideoController {
 
     /**
      * 上传一个视频
-     * @return CategoryInfo列表
+     * @return 随机生成的封面高度
      */
     @PostMapping("/upload")
-    public BaseResponse<Response> upload(@ModelAttribute UploadedVideo uploadedVideo) throws QiniuException {
-        videoService.uploadVideo(uploadedVideo);
-        return ResultUtils.success("success", null);
+    public BaseResponse<Map<String, Integer>> upload(@ModelAttribute UploadedVideo uploadedVideo) throws QiniuException {
+        int coverH = videoService.uploadVideo(uploadedVideo);
+        Map<String, Integer> map = new HashMap<>();
+        map.put("coverH", coverH);
+        return ResultUtils.success("success", map);
     }
 }
