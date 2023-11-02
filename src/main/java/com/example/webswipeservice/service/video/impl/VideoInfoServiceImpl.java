@@ -10,11 +10,13 @@ import com.example.webswipeservice.modal.video.UploadedVideo;
 import com.example.webswipeservice.modal.video.VideoInfo;
 import com.example.webswipeservice.service.video.VideoInfoService;
 import com.example.webswipeservice.tools.VideoTool;
+import com.google.gson.Gson;
 import com.qiniu.common.QiniuException;
 import com.qiniu.http.Response;
 import com.qiniu.storage.BucketManager;
 import com.qiniu.storage.Configuration;
 import com.qiniu.storage.Region;
+import com.qiniu.storage.model.DefaultPutRet;
 import com.qiniu.storage.model.FileInfo;
 import com.qiniu.util.Auth;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,18 +41,21 @@ public class VideoInfoServiceImpl implements VideoInfoService {
     String secretKey;
 
     @Value("${qly-buckets.web-swipe.domain}")
-    String webSwipeDomain;
+    String videoDomain;
     @Value("${qly-buckets.web-swipe.bucket}")
-    String webSwipeBucket;
+    String videoBucket;
     @Value("${qly-buckets.web-swipe-video-cover.domain}")
-    String webSwipeVideoCoverDomain;
+    String coverDomain;
     @Value("${qly-buckets.web-swipe-video-cover.bucket}")
-    String webSwipeVideoCoverBucket;
+    String coverBucket;
+
+    @Value("${qly-pipelines.cover}")
+    String coverPipeline;
 
     @Override
     public String download(String key) throws QiniuException {
         long expireInSeconds = 3600;
-        return VideoTool.buildQlySrcUrl(webSwipeDomain, false, key, expireInSeconds, accessKey, secretKey);
+        return VideoTool.buildQlySrcUrl(videoDomain, false, key, expireInSeconds, accessKey, secretKey);
     }
 
     @Override
@@ -67,7 +72,7 @@ public class VideoInfoServiceImpl implements VideoInfoService {
         BucketManager bucketManager = new BucketManager(auth, cfg);
 
         //列举空间文件列表
-        BucketManager.FileListIterator fileListIterator = bucketManager.createFileListIterator(webSwipeBucket, prefix, limit, delimiter);
+        BucketManager.FileListIterator fileListIterator = bucketManager.createFileListIterator(videoBucket, prefix, limit, delimiter);
         List<String> keyList = new ArrayList<>();
         while (fileListIterator.hasNext()) {
             //处理获取的file list结果
@@ -89,8 +94,8 @@ public class VideoInfoServiceImpl implements VideoInfoService {
 
         // 构建资源外链
         for (VideoInfo videoInfo : videoInfos) {
-            String videoUrl = VideoTool.buildQlySrcUrl(webSwipeDomain, false, videoInfo.getVideoKey(), expireInSeconds, accessKey, secretKey);
-            String coverUrl = VideoTool.buildQlySrcUrl(webSwipeVideoCoverDomain, false, videoInfo.getCoverKey(), expireInSeconds, accessKey, secretKey);
+            String videoUrl = VideoTool.buildQlySrcUrl(videoDomain, false, videoInfo.getVideoKey(), expireInSeconds, accessKey, secretKey);
+            String coverUrl = VideoTool.buildQlySrcUrl(coverDomain, false, videoInfo.getCoverKey(), expireInSeconds, accessKey, secretKey);
             videoInfo.setVideoUrl(videoUrl);
             videoInfo.setCoverUrl(coverUrl);
 
@@ -107,19 +112,39 @@ public class VideoInfoServiceImpl implements VideoInfoService {
         return categoryInfoMapper.selectList(null);
     }
 
-    public Response uploadVideo(UploadedVideo uploadedVideo) {
+    public void uploadVideo(UploadedVideo uploadedVideo) throws QiniuException {
+        Date createAt = new Date();
+
         // 1. 保存视频数据到七牛云
-        Response response = VideoTool.uploadVideo2Qly(uploadedVideo.getFile(), webSwipeBucket, accessKey, secretKey);
+        Response response = VideoTool.uploadVideo2Qly(uploadedVideo.getFile(), videoBucket, accessKey, secretKey);
+        DefaultPutRet putRet = new Gson().fromJson(response.bodyString(), DefaultPutRet.class);
+        String videoKey = putRet.key;
 
-//        // 2. 调用七牛云接口，生成封面
-//        VideoTool.vframe();
-//
-//        // 3. 保存视频封面到web-swipe-cover-video空间
-//        VideoTool.uploadCover2Qly();
-//
-//        // 4. 生成VideoInfo对象，保存到数据库中
-//        VideoInfo videoInfo = new VideoInfo();
+        // 2. 调用七牛云接口，生成封面并上传到web-swipe-cover-video空间
+        // 根据videoKey生成coverKey
+        String coverKey = videoKey.split(".")[0] + "." + uploadedVideo.getCoverImgType();
+        VideoTool.uploadCover2Qly(uploadedVideo, videoBucket, videoKey, accessKey, secretKey, coverBucket, coverKey, coverPipeline);
 
-        return response;
+        // 3. 生成VideoInfo对象
+        long uploaderId = 1;
+        double duration = 1;
+        StringBuilder sb = new StringBuilder();
+        List<String> categories = uploadedVideo.getCategories();
+        sb.append(categories.get(0));
+        for(int i = 1; i < categories.size(); i ++ ) {
+            sb.append(",").append(categories.get(i));
+        }
+
+        VideoInfo videoInfo = new VideoInfo();
+        videoInfo.setVideoKey(videoKey);
+        videoInfo.setCoverKey(coverKey);
+        videoInfo.setUploaderId(uploaderId);
+        videoInfo.setCreateAt(createAt);
+        videoInfo.setDuration(duration);
+        videoInfo.setCategories(sb.toString());
+        videoInfo.setDescription(uploadedVideo.getDescription());
+
+        // 4. 保存到数据库中
+        videoMapper.insert(videoInfo);
     }
 }

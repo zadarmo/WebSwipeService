@@ -21,5 +21,5 @@ public class UploadedVideo {
     int coverH;
     int coverW;
     String coverImgType;
-    String coverOffset;
+    int coverOffset;
 }
