@@ -25,5 +25,5 @@ public interface VideoInfoService {
     List<CategoryInfo> listCategories();
 
     // 上传一个视频
-    Response uploadVideo(UploadedVideo uploadedVideo);
+    void uploadVideo(UploadedVideo uploadedVideo) throws QiniuException;
 }

@@ -81,7 +81,8 @@ public class VideoController {
      * @return CategoryInfo列表
      */
     @PostMapping("/upload")
-    public BaseResponse<Response> upload(@ModelAttribute UploadedVideo uploadedVideo)  {
-        return ResultUtils.success("success", videoService.uploadVideo(uploadedVideo));
+    public BaseResponse<Response> upload(@ModelAttribute UploadedVideo uploadedVideo) throws QiniuException {
+        videoService.uploadVideo(uploadedVideo);
+        return ResultUtils.success("success", null);
     }
 }
