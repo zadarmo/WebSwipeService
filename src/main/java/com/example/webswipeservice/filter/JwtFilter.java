@@ -51,10 +51,14 @@ public class JwtFilter extends OncePerRequestFilter {
             e.printStackTrace();
             throw new RuntimeException("token 解析错误");
         }
+
+        // 查询用户token是否过期
         UserInfo currentUser = redisCache.getCacheObject("userId:" + userId);
         if (Objects.isNull(currentUser)) {
             throw new RuntimeException("用户登录过期,请重新登录");
         }
+
+        // 该用户曾经登陆过，就把用户信息加到context中，这样在其他地方就能随时获取到用户信息
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(currentUser, null, null);
         SecurityContextHolder.getContext().setAuthentication(authenticationToken);
         filterChain.doFilter(request,response);
