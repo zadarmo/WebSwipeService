@@ -21,6 +21,9 @@ qly-buckets:
   web-swipe-video-cover:
     domain: s36e5ap9p.hn-bkt.clouddn.com
     bucket: web-swipe-video-cover
+  web-swipe-user-avatar:
+    domain: s3l6x0ex4.hn-bkt.clouddn.com
+    bucket: web-swipe-user-avatar
 
 qly-pipelines:
   cover: video-cover

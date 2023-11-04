@@ -30,8 +30,13 @@ public class SecurityConfig {
         //将通过Session获取Security Context的功能禁用
         httpSecurity.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         //对接口进行访问限制配置, 这些接口不需要用token进行验证, 用户可以直接访问
-        httpSecurity.authorizeRequests().antMatchers("/user/login","/video/listall","/video/list",
-                "/video/listcategories").anonymous().anyRequest().authenticated();
+        httpSecurity.authorizeRequests().antMatchers(
+                "/user/register",
+                "/user/login",
+                "/video/listall",
+                "/video/list",
+                "/video/listcategories"
+        ).anonymous().anyRequest().authenticated();
         httpSecurity.cors();
         httpSecurity.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
         return httpSecurity.build();
