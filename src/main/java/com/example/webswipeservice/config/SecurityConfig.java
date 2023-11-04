@@ -36,6 +36,8 @@ public class SecurityConfig {
                 "/video/listall",
                 "/video/list",
                 "/video/listcategories"
+//                "/userinteraction/act",
+//                "/userinteraction/cancel"
         ).anonymous().anyRequest().authenticated();
         httpSecurity.cors();
         httpSecurity.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
