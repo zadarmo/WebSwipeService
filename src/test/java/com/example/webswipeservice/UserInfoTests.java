@@ -27,7 +27,6 @@ class UserInfoTests {
         // 检测插入用户的id
         long key = userInfo.getId();
         System.out.println("key:"+key);
-
     }
 
     @Test
