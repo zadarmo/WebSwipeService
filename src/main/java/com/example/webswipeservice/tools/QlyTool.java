@@ -15,9 +15,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.util.List;
 
-public class VideoTool {
+public class QlyTool {
     /**
      * 生成七牛云的资源访问外链
      * @param domain 域名
@@ -52,7 +51,7 @@ public class VideoTool {
      * @param secretKey
      * @return
      */
-    public static Response uploadVideo2Qly(MultipartFile file, String bucket, String accessKey, String secretKey) {
+    public static Response uploadSrc2Qly(MultipartFile file, String bucket, String accessKey, String secretKey) {
         //构造一个带指定 Region 对象的配置类
         Configuration cfg = new Configuration(Region.region2());
 //        cfg.resumableUploadAPIVersion = Configuration.ResumableUploadAPIVersion.V2;// 指定分片上传版本

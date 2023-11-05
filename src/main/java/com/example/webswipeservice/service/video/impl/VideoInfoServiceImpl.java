@@ -9,7 +9,7 @@ import com.example.webswipeservice.modal.video.CategoryInfo;
 import com.example.webswipeservice.modal.video.UploadedVideo;
 import com.example.webswipeservice.modal.video.VideoInfo;
 import com.example.webswipeservice.service.video.VideoInfoService;
-import com.example.webswipeservice.tools.VideoTool;
+import com.example.webswipeservice.tools.QlyTool;
 import com.google.gson.Gson;
 import com.qiniu.common.QiniuException;
 import com.qiniu.http.Response;
@@ -55,7 +55,7 @@ public class VideoInfoServiceImpl implements VideoInfoService {
     @Override
     public String download(String key) throws QiniuException {
         long expireInSeconds = 3600;
-        return VideoTool.buildQlySrcUrl(videoDomain, false, key, expireInSeconds, accessKey, secretKey);
+        return QlyTool.buildQlySrcUrl(videoDomain, false, key, expireInSeconds, accessKey, secretKey);
     }
 
     @Override
@@ -94,8 +94,8 @@ public class VideoInfoServiceImpl implements VideoInfoService {
 
         // 构建资源外链
         for (VideoInfo videoInfo : videoInfos) {
-            String videoUrl = VideoTool.buildQlySrcUrl(videoDomain, false, videoInfo.getVideoKey(), expireInSeconds, accessKey, secretKey);
-            String coverUrl = VideoTool.buildQlySrcUrl(coverDomain, false, videoInfo.getCoverKey(), expireInSeconds, accessKey, secretKey);
+            String videoUrl = QlyTool.buildQlySrcUrl(videoDomain, false, videoInfo.getVideoKey(), expireInSeconds, accessKey, secretKey);
+            String coverUrl = QlyTool.buildQlySrcUrl(coverDomain, false, videoInfo.getCoverKey(), expireInSeconds, accessKey, secretKey);
             videoInfo.setVideoUrl(videoUrl);
             videoInfo.setCoverUrl(coverUrl);
 
@@ -112,18 +112,30 @@ public class VideoInfoServiceImpl implements VideoInfoService {
         return categoryInfoMapper.selectList(null);
     }
 
-    public void uploadVideo(UploadedVideo uploadedVideo) throws QiniuException {
+    public int uploadVideo(UploadedVideo uploadedVideo) throws QiniuException {
         Date createAt = new Date();
+        // 随机生成封面高度，并返回
+        int coverH = -1;
+        if (uploadedVideo.getIsVertical() == 0) {
+            int _min = 500;
+            int _max = 600;
+            coverH = (int)(Math.random() * (_max - _min + 1)) + _min;
+        } else {
+            int _min = 300;
+            int _max = 400;
+            coverH = (int)(Math.random() * (_max - _min + 1)) + _min;
+        }
+        uploadedVideo.setCoverH(coverH);
 
         // 1. 保存视频数据到七牛云
-        Response response = VideoTool.uploadVideo2Qly(uploadedVideo.getFile(), videoBucket, accessKey, secretKey);
+        Response response = QlyTool.uploadSrc2Qly(uploadedVideo.getFile(), videoBucket, accessKey, secretKey);
         DefaultPutRet putRet = new Gson().fromJson(response.bodyString(), DefaultPutRet.class);
         String videoKey = putRet.key;
 
         // 2. 调用七牛云接口，生成封面并上传到web-swipe-cover-video空间
         // 根据videoKey生成coverKey
         String coverKey = videoKey;
-        VideoTool.uploadCover2Qly(uploadedVideo, videoBucket, videoKey, accessKey, secretKey, coverBucket, coverKey, coverPipeline);
+        QlyTool.uploadCover2Qly(uploadedVideo, videoBucket, videoKey, accessKey, secretKey, coverBucket, coverKey, coverPipeline);
 
         // 3. 生成VideoInfo对象
         long uploaderId = 1;
@@ -141,5 +153,8 @@ public class VideoInfoServiceImpl implements VideoInfoService {
 
         // 4. 保存到数据库中
         videoMapper.insert(videoInfo);
+
+        // 5. 返回封面高度
+        return coverH;
     }
 }

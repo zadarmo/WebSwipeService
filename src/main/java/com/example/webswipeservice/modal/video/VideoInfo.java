@@ -3,13 +3,11 @@ package com.example.webswipeservice.modal.video;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.example.webswipeservice.tools.VideoTool;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.beans.Transient;
 import java.util.Date;
 
 @TableName("video_info")

@@ -1,5 +1,6 @@
 package com.example.webswipeservice.modal.user;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.example.webswipeservice.constant.EnumSex;
@@ -16,6 +17,11 @@ public class UserInfo {
     private long id;
     private String username;
     private String password;
-    private int age;
-    private EnumSex sex;
+    private String avatarKey;
+
+    @TableField(exist = false)
+    private String avatarUrl;
+    public void setAvatarUrl(String url) {
+        this.avatarUrl = url;
+    }
 }
