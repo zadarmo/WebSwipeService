@@ -21,9 +21,7 @@ import com.example.webswipeservice.modal.video.UploadedVideo;
 import com.example.webswipeservice.network.BaseResponse;
 import com.example.webswipeservice.network.ResultUtils;
 import com.example.webswipeservice.service.video.VideoInfoService;
-import com.google.gson.JsonObject;
 import com.qiniu.common.QiniuException;
-import com.qiniu.http.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,7 +31,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/video")
-public class VideoController {
+public class VideoInfoController {
     @Autowired
     VideoInfoService videoService;
 
