@@ -5,8 +5,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -20,6 +18,6 @@ public class UploadedVideo {
     // 封面参数
     int coverH = 500;
     int coverW = 260;
-    String coverImgType = "png";
-    int coverOffset = 1;
+    String coverImgType = "jpg";
+    int offset;
 }
