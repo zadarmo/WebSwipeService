@@ -8,25 +8,36 @@ import com.example.webswipeservice.network.ResultUtils;
 import com.example.webswipeservice.service.user.UserInfoService;
 import com.example.webswipeservice.service.user.impl.UserDetailsServiceImpl;
 import com.example.webswipeservice.tools.JwtUtil;
+import com.example.webswipeservice.tools.QlyTool;
 import com.example.webswipeservice.tools.RedisCache;
 import com.qiniu.common.QiniuException;
+import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequestMapping("/user")
 public class UserInfoController {
 
+    @Value("${qly-user.access-key}")
+    String accessKey;
+    @Value("${qly-user.secret-key}")
+    String secretKey;
+
+    @Value("${qly-buckets.web-swipe-user-avatar.domain}")
+    String avatarDomain;
+    @Value("${qly-buckets.web-swipe-user-avatar.bucket}")
+    String avatarBucket;
 
     @Autowired
     UserInfoService userInfoService;
@@ -66,6 +77,31 @@ public class UserInfoController {
     public BaseResponse<Object> register(RegisterUserInfo registerUserInfo) throws QiniuException {
         userInfoService.register(registerUserInfo);
         return ResultUtils.success("success", null);
+    }
+
+    @PostMapping("/logout")
+    public BaseResponse<Object> logout(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserInfo userInfo = (UserInfo) authentication.getPrincipal();
+        long id = userInfo.getId();
+        redisCache.deleteObject("userId:"+ id);
+        return ResultUtils.success("logout success",null);
+    }
+    
+    @GetMapping("/current")
+    public BaseResponse<Object> getCurrentUser() throws QiniuException {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserInfo userInfo = (UserInfo) authentication.getPrincipal();
+        if(Objects.isNull(userInfo)){
+            return ResultUtils.success("success",new Object());
+        }
+        long expireInSeconds = 3600;
+
+        String avatarUrl = QlyTool.buildQlySrcUrl(avatarDomain, false, userInfo.getAvatarKey(),
+                expireInSeconds, accessKey, secretKey);
+        userInfo.setAvatarUrl(avatarUrl);
+
+        return ResultUtils.success("success",userInfo);
     }
 
     @PostMapping("/testJwt")
