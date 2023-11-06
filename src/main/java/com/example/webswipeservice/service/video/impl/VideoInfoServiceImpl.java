@@ -1,13 +1,17 @@
 package com.example.webswipeservice.service.video.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.example.webswipeservice.mapper.user.UserInfoMapper;
+import com.example.webswipeservice.mapper.userinteraction.UserInteractionMapper;
 import com.example.webswipeservice.mapper.video.CategoryInfoMapper;
 import com.example.webswipeservice.mapper.video.VideoInfoMapper;
 import com.example.webswipeservice.modal.user.UserInfo;
+import com.example.webswipeservice.modal.userinteraction.UserInteraction;
 import com.example.webswipeservice.modal.video.CategoryInfo;
 import com.example.webswipeservice.modal.video.UploadedVideo;
 import com.example.webswipeservice.modal.video.VideoInfo;
+import com.example.webswipeservice.service.userinteraction.UserInteractionService;
 import com.example.webswipeservice.service.video.VideoInfoService;
 import com.example.webswipeservice.tools.QlyTool;
 import com.google.gson.Gson;
@@ -26,6 +30,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class VideoInfoServiceImpl implements VideoInfoService {
@@ -36,6 +41,8 @@ public class VideoInfoServiceImpl implements VideoInfoService {
     UserInfoMapper userInfoMapper;
     @Autowired
     CategoryInfoMapper categoryInfoMapper;
+    @Autowired
+    UserInteractionMapper userInteractionMapper;
 
     @Value("${qly-user.access-key}")
     String accessKey;
@@ -161,5 +168,39 @@ public class VideoInfoServiceImpl implements VideoInfoService {
 
         // 5. 返回封面高度
         return coverH;
+    }
+
+    @Override
+    public List<VideoInfo> selectByUserId(long id) {
+        LambdaQueryWrapper<VideoInfo> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.eq(VideoInfo::getUploaderId, id);
+        return videoMapper.selectList(lambdaQueryWrapper);
+    }
+
+    @Override
+    public List<VideoInfo> selectInteractionVideo(long userId, String interactionType) {
+        // 1. 在user_interaction表中获取用户id为userId互动为InteractionType的视频id
+        LambdaQueryWrapper<UserInteraction> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper
+                .eq(UserInteraction::getUserId, userId)
+                .eq(UserInteraction::getInteractionType, interactionType);
+        List<UserInteraction> userInteractions = userInteractionMapper.selectList(lambdaQueryWrapper);
+
+        // 2. 根据视频id，查询视频的所有信息
+        if (!userInteractions.isEmpty()) {
+            // Extract video_id values from the result
+            List<Long> videoIds = userInteractions.stream()
+                    .map(UserInteraction::getVideoId)
+                    .collect(Collectors.toList());
+
+            // Query table2 for video_info using the video_id values
+            LambdaQueryWrapper<VideoInfo> lambdaQueryWrapper2 = new LambdaQueryWrapper<>();
+            lambdaQueryWrapper2.in(VideoInfo::getId, videoIds);
+            List<VideoInfo> videoInfos = videoMapper.selectList(lambdaQueryWrapper2);
+            return videoInfos;
+        }
+
+        // Handle the case when there are no records in table1
+        return Collections.emptyList();
     }
 }

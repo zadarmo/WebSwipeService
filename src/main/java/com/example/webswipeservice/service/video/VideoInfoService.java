@@ -26,4 +26,10 @@ public interface VideoInfoService {
 
     // 上传一个视频
     int uploadVideo(UploadedVideo uploadedVideo) throws QiniuException;
+
+    // 根据用户id查询视频
+    List<VideoInfo> selectByUserId(long id);
+
+    // 获取用户互动的视频
+    List<VideoInfo> selectInteractionVideo(long userId, String interactionType);
 }

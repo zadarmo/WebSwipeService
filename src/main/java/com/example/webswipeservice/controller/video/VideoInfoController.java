@@ -16,18 +16,23 @@
 
 package com.example.webswipeservice.controller.video;
 
+import com.example.webswipeservice.modal.user.UserInfo;
 import com.example.webswipeservice.modal.video.CategoryInfo;
 import com.example.webswipeservice.modal.video.UploadedVideo;
 import com.example.webswipeservice.network.BaseResponse;
 import com.example.webswipeservice.network.ResultUtils;
 import com.example.webswipeservice.service.video.VideoInfoService;
+import com.example.webswipeservice.tools.QlyTool;
 import com.qiniu.common.QiniuException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/video")
@@ -87,5 +92,43 @@ public class VideoInfoController {
         Map<String, Integer> map = new HashMap<>();
         map.put("coverH", coverH);
         return ResultUtils.success("success", map);
+    }
+
+    /**
+     * 根据用户id查询视频
+     * @return
+     */
+    @PostMapping("/getuploadvideo")
+    public BaseResponse<Object> getUploadVideo() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserInfo userInfo = null;
+        try {
+            userInfo = (UserInfo) authentication.getPrincipal();
+        }catch (Exception e){
+            return ResultUtils.success("当前未登录",null);
+        }
+        if(Objects.isNull(userInfo)){
+            return ResultUtils.success("当前未登录",new Object());
+        }
+        return ResultUtils.success("success",videoService.selectByUserId(userInfo.getId()));
+    }
+
+    /**
+     * 获取用户互动的视频
+     * @return
+     */
+    @PostMapping("/getinteractionvideo")
+    public BaseResponse<Object> getinteractionvideo(@RequestBody String interactionType) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserInfo userInfo = null;
+        try {
+            userInfo = (UserInfo) authentication.getPrincipal();
+        }catch (Exception e){
+            return ResultUtils.success("当前未登录",null);
+        }
+        if(Objects.isNull(userInfo)){
+            return ResultUtils.success("当前未登录",new Object());
+        }
+        return ResultUtils.success("success",videoService.selectInteractionVideo(userInfo.getId(), interactionType));
     }
 }
