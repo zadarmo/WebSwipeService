@@ -53,19 +53,13 @@ public class UserInfoController {
      */
     @PostMapping("/login")
     public BaseResponse<Map<String,String>> login(@RequestBody UserInfo userInfo){
-        // spring security的要求需要把UserInfo用IUserDetails封装一层
-        IUserDetails userDetails = (IUserDetails) userDetailService.loadUserByUsername(userInfo.getUsername());
-
-        // 根据用户信息生成token
-        String jwt = JwtUtil.createJWT(String.valueOf(userDetails.getUserInfo().getId()));
-        HashMap<String, String> jwtTokenMap = new HashMap<>();
-        jwtTokenMap.put("webSwipeToken",jwt);
-
-        // 存到redis, 用来查询token是否过期. 如果过期, 则说明用户需要重新登录. 用户成功登录则将token存入redis
-        redisCache.setCacheObject("userId:"+userDetails.getUserInfo().getId(),
-                userDetails.getUserInfo(),3, TimeUnit.HOURS);
-
-        return ResultUtils.success("login success", jwtTokenMap);
+        HashMap<String, String> token = userInfoService.login(userInfo);
+        if (token == null) {
+            return ResultUtils.error(-1, "login failed");
+        } else {
+            System.out.println(token);
+            return ResultUtils.success("login success", token);
+        }
     }
 
     /**
