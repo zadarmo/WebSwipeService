@@ -69,8 +69,11 @@ public class UserInfoController {
      */
     @PostMapping("/register")
     public BaseResponse<Object> register(RegisterUserInfo registerUserInfo) throws QiniuException {
-        userInfoService.register(registerUserInfo);
-        return ResultUtils.success("success", null);
+        if (userInfoService.register(registerUserInfo)) {
+            return ResultUtils.success("register success", null);
+        } else {
+            return ResultUtils.error(-1, "Register failed, username exists!");
+        }
     }
 
     /**

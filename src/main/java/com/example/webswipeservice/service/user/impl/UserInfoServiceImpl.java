@@ -82,17 +82,26 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo> i
 
     @Override
     @Transactional
-    public void register(RegisterUserInfo registerUserInfo) throws QiniuException {
-        // 1. 上传头像
-        Response response = QlyTool.uploadSrc2Qly(registerUserInfo.getAvatar(), avatarBucket, accessKey, secretKey);
-        DefaultPutRet putRet = new Gson().fromJson(response.bodyString(), DefaultPutRet.class);
-        String avatarKey = putRet.key;
+    public boolean register(RegisterUserInfo registerUserInfo) throws QiniuException {
+        String username = registerUserInfo.getUsername();
+        LambdaQueryWrapper<UserInfo> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.eq(UserInfo::getUsername, username);
+        UserInfo dbUserInfo = userInfoMapper.selectOne(lambdaQueryWrapper);
+        if (dbUserInfo == null) { // 判断用户名是否存在
+            // 1. 上传头像
+            Response response = QlyTool.uploadSrc2Qly(registerUserInfo.getAvatar(), avatarBucket, accessKey, secretKey);
+            DefaultPutRet putRet = new Gson().fromJson(response.bodyString(), DefaultPutRet.class);
+            String avatarKey = putRet.key;
 
-        // 2. 保存用户到数据库
-        UserInfo userInfo = new UserInfo();
-        userInfo.setUsername(registerUserInfo.getUsername());
-        userInfo.setPassword(passwordEncoder.encode(registerUserInfo.getPassword()));
-        userInfo.setAvatarKey(avatarKey);
-        userInfoMapper.insert(userInfo);
+            // 2. 保存用户到数据库
+            UserInfo userInfo = new UserInfo();
+            userInfo.setUsername(registerUserInfo.getUsername());
+            userInfo.setPassword(passwordEncoder.encode(registerUserInfo.getPassword()));
+            userInfo.setAvatarKey(avatarKey);
+            userInfoMapper.insert(userInfo);
+            return true;
+        } else {
+            return false;
+        }
     }
 }

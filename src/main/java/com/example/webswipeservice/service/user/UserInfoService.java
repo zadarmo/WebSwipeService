@@ -13,5 +13,5 @@ import java.util.HashMap;
 public interface UserInfoService extends IService<UserInfo> {
 
     HashMap<String, String> login(UserInfo userInfo);
-    void register(RegisterUserInfo registerUserInfo) throws QiniuException;
+    boolean register(RegisterUserInfo registerUserInfo) throws QiniuException;
 }
