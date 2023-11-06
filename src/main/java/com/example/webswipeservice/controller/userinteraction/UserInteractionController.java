@@ -16,21 +16,13 @@
 
 package com.example.webswipeservice.controller.userinteraction;
 
-import com.example.webswipeservice.modal.user.UserInfo;
 import com.example.webswipeservice.modal.userinteraction.UserInteraction;
-import com.example.webswipeservice.modal.video.CategoryInfo;
-import com.example.webswipeservice.modal.video.UploadedVideo;
 import com.example.webswipeservice.network.BaseResponse;
 import com.example.webswipeservice.network.ResultUtils;
 import com.example.webswipeservice.service.userinteraction.UserInteractionService;
-import com.example.webswipeservice.service.video.VideoInfoService;
-import com.qiniu.common.QiniuException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/userinteraction")
