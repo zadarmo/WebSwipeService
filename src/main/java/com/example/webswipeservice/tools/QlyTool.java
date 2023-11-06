@@ -99,9 +99,13 @@ public class QlyTool {
         //新建一个OperationManager对象
         Configuration cfg = new Configuration(Region.region2());
         OperationManager operater = new OperationManager(auth, cfg);
+        //设置要转码的空间和key，并且这个key在你空间中存在
+        String bucket = videoBucket;
+        String key = videoKey;
+        //设置转码操作参数
         //设置转码操作参数
         String coverImgType = uploadedVideo.getCoverImgType();
-        int coverOffset = uploadedVideo.getCoverOffset();
+        int coverOffset = uploadedVideo.getOffset();
         int coverH = uploadedVideo.getCoverH();
         int coverW = uploadedVideo.getCoverW();
         String coverRotate = "auto";
@@ -116,17 +120,28 @@ public class QlyTool {
                 .append("/rotate/").append(coverRotate);
         String fops = sb.toString();
 
+//        String fops = "vframe/jpg/offset/0/w/480/h/360/rotate/auto";
         //可以对转码后的文件进行使用saveas参数自定义命名，当然也可以不指定文件会默认命名并保存在当前空间。
+//        String urlbase64 = UrlSafeBase64.encodeToString("web-swipe-video-cover:tes_t-2123123123122");
         String urlbase64 = UrlSafeBase64.encodeToString(coverBucket + ":" + coverKey);
         String pfops = fops + "|saveas/" + urlbase64;
         //设置pipeline参数
         StringMap params = new StringMap().putWhen("force", 1, true).putNotEmpty("pipeline", pipeline);
         try {
-            String persistid = operater.pfop(videoBucket, videoKey, pfops, params);
-            //打印返回的persistid, 可用于查询持久化状态
+            String persistid = operater.pfop(bucket, key, pfops, params);
+            //打印返回的persistid
             System.out.println(persistid);
         } catch (QiniuException e) {
-            System.out.println(e.getMessage());
+            //捕获异常信息
+            Response r = e.response;
+            // 请求失败时简单状态信息
+            System.out.println(r.toString());
+            try {
+                // 响应的文本信息
+                System.out.println(r.bodyString());
+            } catch (QiniuException e1) {
+                //ignore
+            }
         }
     }
 }

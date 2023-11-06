@@ -123,14 +123,10 @@ public class VideoInfoServiceImpl implements VideoInfoService {
         Date createAt = new Date();
         // 随机生成封面高度，并返回
         int coverH = -1;
-        if (uploadedVideo.getIsVertical() == 0) {
-            int _min = 500;
-            int _max = 600;
-            coverH = (int)(Math.random() * (_max - _min + 1)) + _min;
+        if (uploadedVideo.getIsVertical() == 1) {
+            coverH = 450;
         } else {
-            int _min = 300;
-            int _max = 400;
-            coverH = (int)(Math.random() * (_max - _min + 1)) + _min;
+            coverH = 350;
         }
         uploadedVideo.setCoverH(coverH);
 
@@ -141,7 +137,8 @@ public class VideoInfoServiceImpl implements VideoInfoService {
 
         // 2. 调用七牛云接口，生成封面并上传到web-swipe-cover-video空间
         // 根据videoKey生成coverKey
-        String coverKey = videoKey;
+//        String coverKey = videoKey;
+        String coverKey = String.valueOf(new Date().getTime());
         QlyTool.uploadCover2Qly(uploadedVideo, videoBucket, videoKey, accessKey, secretKey, coverBucket, coverKey, coverPipeline);
 
         // 3. 生成VideoInfo对象
