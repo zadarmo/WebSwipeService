@@ -87,13 +87,18 @@ public class UserInfoController {
         redisCache.deleteObject("userId:"+ id);
         return ResultUtils.success("logout success",null);
     }
-    
+
     @GetMapping("/current")
     public BaseResponse<Object> getCurrentUser() throws QiniuException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        UserInfo userInfo = (UserInfo) authentication.getPrincipal();
+        UserInfo userInfo = null;
+        try {
+            userInfo = (UserInfo) authentication.getPrincipal();
+        }catch (Exception e){
+            return ResultUtils.success("当前未登录",null);
+        }
         if(Objects.isNull(userInfo)){
-            return ResultUtils.success("success",new Object());
+            return ResultUtils.success("当前未登录",new Object());
         }
         long expireInSeconds = 3600;
 
