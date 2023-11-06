@@ -79,6 +79,10 @@ public class UserInfoController {
         return ResultUtils.success("success", null);
     }
 
+    /**
+     * 用户登出
+     * @return
+     */
     @PostMapping("/logout")
     public BaseResponse<Object> logout(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -88,6 +92,11 @@ public class UserInfoController {
         return ResultUtils.success("logout success",null);
     }
 
+    /**
+     * 获取登录用户的信息
+     * @return
+     * @throws QiniuException
+     */
     @GetMapping("/current")
     public BaseResponse<Object> getCurrentUser() throws QiniuException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
