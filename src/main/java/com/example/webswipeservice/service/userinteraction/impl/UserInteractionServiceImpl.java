@@ -18,6 +18,8 @@ import com.qiniu.http.Response;
 import com.qiniu.storage.model.DefaultPutRet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,15 +35,22 @@ public class UserInteractionServiceImpl extends ServiceImpl<UserInteractionMappe
 
     @Override
     public void add(UserInteraction userInteraction) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserInfo userInfo = (UserInfo) authentication.getPrincipal();
+        long userId = userInfo.getId();
+
         Date date = new Date();
         userInteraction.setOperateAt(date);
+        userInteraction.setUserId(userId);
         userInteractionMapper.insert(userInteraction);
     }
 
     @Override
     public void delete(UserInteraction userInteraction) {
         // userId, videoId, interactionType唯一表示一条记录
-        long userId = userInteraction.getUserId();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserInfo userInfo = (UserInfo) authentication.getPrincipal();
+        long userId = userInfo.getId();
         long videoId = userInteraction.getVideoId();
         EnumInteractionType interactionType = userInteraction.getInteractionType();
 

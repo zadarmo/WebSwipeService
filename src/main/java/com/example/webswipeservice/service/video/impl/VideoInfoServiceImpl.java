@@ -21,6 +21,8 @@ import com.qiniu.storage.model.FileInfo;
 import com.qiniu.util.Auth;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -113,6 +115,11 @@ public class VideoInfoServiceImpl implements VideoInfoService {
     }
 
     public int uploadVideo(UploadedVideo uploadedVideo) throws QiniuException {
+        // 获取上传用户的id
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserInfo userInfo = (UserInfo) authentication.getPrincipal();
+        long userId = userInfo.getId();
+
         Date createAt = new Date();
         // 随机生成封面高度，并返回
         int coverH = -1;
@@ -138,15 +145,16 @@ public class VideoInfoServiceImpl implements VideoInfoService {
         QlyTool.uploadCover2Qly(uploadedVideo, videoBucket, videoKey, accessKey, secretKey, coverBucket, coverKey, coverPipeline);
 
         // 3. 生成VideoInfo对象
-        long uploaderId = 1;
         double duration = 1;
         String categories = uploadedVideo.getCategories();
 
         VideoInfo videoInfo = new VideoInfo();
         videoInfo.setVideoKey(videoKey);
         videoInfo.setCoverKey(coverKey);
-        videoInfo.setUploaderId(uploaderId);
+
+        videoInfo.setUploaderId(userInfo.getId());
         videoInfo.setCreateAt(createAt);
+        videoInfo.setUploaderId(userId);
         videoInfo.setDuration(duration);
         videoInfo.setCategories(categories);
         videoInfo.setDescription(uploadedVideo.getDescription());
