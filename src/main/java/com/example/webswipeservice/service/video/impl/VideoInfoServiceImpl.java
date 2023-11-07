@@ -61,7 +61,7 @@ public class VideoInfoServiceImpl implements VideoInfoService {
     @Value("${qly-pipelines.cover}")
     String coverPipeline;
 
-    @Value("qly-expireInSeconds")
+    @Value("${qly-expireInSeconds}")
     long expireInSeconds;
 
     @Override
