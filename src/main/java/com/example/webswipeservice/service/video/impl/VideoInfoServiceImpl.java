@@ -203,4 +203,29 @@ public class VideoInfoServiceImpl implements VideoInfoService {
         // Handle the case when there are no records in table1
         return Collections.emptyList();
     }
+
+    @Override
+    public List<VideoInfo> search(String desc, boolean latest) throws QiniuException {
+        // 模糊查询描述
+        LambdaQueryWrapper<VideoInfo> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.like(VideoInfo::getDescription, desc);
+        if (latest) {
+            lambdaQueryWrapper.orderByDesc(VideoInfo::getCreateAt);
+        }
+        List<VideoInfo> videoInfos = videoMapper.selectList(lambdaQueryWrapper);
+
+        // 构建资源外链
+        long expireInSeconds = 3600;
+        for (VideoInfo videoInfo : videoInfos) {
+            String videoUrl = QlyTool.buildQlySrcUrl(videoDomain, false, videoInfo.getVideoKey(), expireInSeconds, accessKey, secretKey);
+            String coverUrl = QlyTool.buildQlySrcUrl(coverDomain, false, videoInfo.getCoverKey(), expireInSeconds, accessKey, secretKey);
+            videoInfo.setVideoUrl(videoUrl);
+            videoInfo.setCoverUrl(coverUrl);
+
+            // 查询用户名
+            UserInfo userInfo = userInfoMapper.selectById(videoInfo.getUploaderId());
+            videoInfo.setUsername(userInfo.getUsername());
+        }
+        return videoInfos;
+    }
 }

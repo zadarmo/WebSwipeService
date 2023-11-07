@@ -19,6 +19,7 @@ package com.example.webswipeservice.controller.video;
 import com.example.webswipeservice.modal.user.UserInfo;
 import com.example.webswipeservice.modal.video.CategoryInfo;
 import com.example.webswipeservice.modal.video.UploadedVideo;
+import com.example.webswipeservice.modal.video.VideoInfo;
 import com.example.webswipeservice.network.BaseResponse;
 import com.example.webswipeservice.network.ResultUtils;
 import com.example.webswipeservice.service.video.VideoInfoService;
@@ -130,5 +131,17 @@ public class VideoInfoController {
             return ResultUtils.success("当前未登录",new Object());
         }
         return ResultUtils.success("success",videoService.selectInteractionVideo(userInfo.getId(), interactionType));
+    }
+
+    /**
+     * 搜索视频
+     * @return
+     */
+    @GetMapping("/search")
+    public BaseResponse<List<VideoInfo>> search(@RequestParam String desc, @RequestParam(required = false) Boolean latest) throws QiniuException {
+        if (latest == null) {
+            latest = false;
+        }
+        return ResultUtils.success("success", videoService.search(desc, latest));
     }
 }

@@ -32,4 +32,7 @@ public interface VideoInfoService {
 
     // 获取用户互动的视频
     List<VideoInfo> selectInteractionVideo(long userId, String interactionType);
+
+    // 搜索视频
+    List<VideoInfo> search(String desc, boolean latest) throws QiniuException;
 }
