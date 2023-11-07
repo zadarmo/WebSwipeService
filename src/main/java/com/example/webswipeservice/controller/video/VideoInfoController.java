@@ -118,8 +118,8 @@ public class VideoInfoController {
      * 获取用户互动的视频
      * @return
      */
-    @PostMapping("/getinteractionvideo")
-    public BaseResponse<Object> getinteractionvideo(@RequestBody String interactionType) {
+    @GetMapping("/getinteractionvideo")
+    public BaseResponse<Object> getinteractionvideo(@RequestParam(value="interactionType") String interactionType) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UserInfo userInfo = null;
         try {

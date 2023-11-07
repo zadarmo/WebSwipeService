@@ -23,6 +23,7 @@ import com.qiniu.storage.Region;
 import com.qiniu.storage.model.DefaultPutRet;
 import com.qiniu.storage.model.FileInfo;
 import com.qiniu.util.Auth;
+import com.qiniu.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
@@ -96,10 +97,14 @@ public class VideoInfoServiceImpl implements VideoInfoService {
     }
 
     public List<VideoInfo> list(String category) throws QiniuException {
-        // 从数据库中查询满足tags字段包含tag的数据
-        QueryWrapper<VideoInfo> queryMapper = new QueryWrapper<>();
-        queryMapper.like("categories", category);
-        return videoMapper.selectList(queryMapper);
+        if (StringUtils.isNullOrEmpty(category) || category.equals("popular")) {
+            return videoMapper.selectList(null);
+        } else {
+            // 从数据库中查询满足tags字段包含tag的数据
+            QueryWrapper<VideoInfo> queryMapper = new QueryWrapper<>();
+            queryMapper.like("categories", category);
+            return videoMapper.selectList(queryMapper);
+        }
     }
 
     @Override
