@@ -42,25 +42,6 @@ public class VideoInfoController {
     VideoInfoService videoService;
 
     /**
-     * 下载一个视频
-     * @return 返回请求的视频经过封装后的可直接访问的链接
-     * @throws QiniuException
-     */
-    @RequestMapping("/download")
-    public BaseResponse<String> download(@RequestParam String key) throws QiniuException {
-        return ResultUtils.success("success", videoService.download(key));
-    }
-
-    /**
-     * 列举空间文件列表
-     * @return 字符串列表，存放所有文件的key值
-     */
-    @RequestMapping("/listall")
-    public BaseResponse<List<String>> listAll() {
-        return ResultUtils.success("success", videoService.listAll());
-    }
-
-    /**
      * 查询单个标签的视频列表
      * @return VideoInfo列表
      */
