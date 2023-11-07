@@ -99,21 +99,7 @@ public class VideoInfoServiceImpl implements VideoInfoService {
         // 从数据库中查询满足tags字段包含tag的数据
         QueryWrapper<VideoInfo> queryMapper = new QueryWrapper<>();
         queryMapper.like("categories", category);
-        List<VideoInfo> videoInfos = videoMapper.selectList(queryMapper);
-
-        // 构建资源外链
-        for (VideoInfo videoInfo : videoInfos) {
-            String videoUrl = QlyTool.buildQlySrcUrl(videoDomain, false, videoInfo.getVideoKey(), expireInSeconds, accessKey, secretKey);
-            String coverUrl = QlyTool.buildQlySrcUrl(coverDomain, false, videoInfo.getCoverKey(), expireInSeconds, accessKey, secretKey);
-            videoInfo.setVideoUrl(videoUrl);
-            videoInfo.setCoverUrl(coverUrl);
-
-            // 查询用户名
-            UserInfo userInfo = userInfoMapper.selectById(videoInfo.getUploaderId());
-            videoInfo.setUsername(userInfo.getUsername());
-        }
-
-        return videoInfos;
+        return videoMapper.selectList(queryMapper);
     }
 
     @Override
@@ -213,18 +199,6 @@ public class VideoInfoServiceImpl implements VideoInfoService {
             lambdaQueryWrapper.orderByDesc(VideoInfo::getCreateAt);
         }
         List<VideoInfo> videoInfos = videoMapper.selectList(lambdaQueryWrapper);
-
-        // 构建资源外链
-        for (VideoInfo videoInfo : videoInfos) {
-            String videoUrl = QlyTool.buildQlySrcUrl(videoDomain, false, videoInfo.getVideoKey(), expireInSeconds, accessKey, secretKey);
-            String coverUrl = QlyTool.buildQlySrcUrl(coverDomain, false, videoInfo.getCoverKey(), expireInSeconds, accessKey, secretKey);
-            videoInfo.setVideoUrl(videoUrl);
-            videoInfo.setCoverUrl(coverUrl);
-
-            // 查询用户名
-            UserInfo userInfo = userInfoMapper.selectById(videoInfo.getUploaderId());
-            videoInfo.setUsername(userInfo.getUsername());
-        }
         return videoInfos;
     }
 }
