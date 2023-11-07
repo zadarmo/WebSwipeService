@@ -8,6 +8,7 @@ import com.example.webswipeservice.mapper.user.UserInfoMapper;
 import com.example.webswipeservice.mapper.userinteraction.UserInteractionMapper;
 import com.example.webswipeservice.modal.user.UserInfo;
 import com.example.webswipeservice.modal.user.controller.RegisterUserInfo;
+import com.example.webswipeservice.modal.user.controller.UserInfoHolder;
 import com.example.webswipeservice.modal.userinteraction.UserInteraction;
 import com.example.webswipeservice.service.user.UserInfoService;
 import com.example.webswipeservice.service.userinteraction.UserInteractionService;
@@ -35,8 +36,7 @@ public class UserInteractionServiceImpl extends ServiceImpl<UserInteractionMappe
 
     @Override
     public void add(UserInteraction userInteraction) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        UserInfo userInfo = (UserInfo) authentication.getPrincipal();
+        UserInfo userInfo = UserInfoHolder.getUserInfo();
         long userId = userInfo.getId();
 
         Date date = new Date();
@@ -48,8 +48,7 @@ public class UserInteractionServiceImpl extends ServiceImpl<UserInteractionMappe
     @Override
     public void delete(UserInteraction userInteraction) {
         // userId, videoId, interactionType唯一表示一条记录
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        UserInfo userInfo = (UserInfo) authentication.getPrincipal();
+        UserInfo userInfo = UserInfoHolder.getUserInfo();
         long userId = userInfo.getId();
         long videoId = userInteraction.getVideoId();
         EnumInteractionType interactionType = userInteraction.getInteractionType();

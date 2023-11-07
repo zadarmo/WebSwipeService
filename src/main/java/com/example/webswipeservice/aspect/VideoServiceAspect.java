@@ -5,13 +5,17 @@ import com.example.webswipeservice.mapper.userinteraction.UserInteractionMapper;
 import com.example.webswipeservice.mapper.video.CategoryInfoMapper;
 import com.example.webswipeservice.mapper.video.VideoInfoMapper;
 import com.example.webswipeservice.modal.user.UserInfo;
+import com.example.webswipeservice.modal.user.controller.UserInfoHolder;
 import com.example.webswipeservice.modal.video.VideoInfo;
 import com.example.webswipeservice.tools.QlyTool;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Before;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import java.util.List;

@@ -14,4 +14,8 @@ public interface UserInfoService extends IService<UserInfo> {
 
     HashMap<String, String> login(UserInfo userInfo);
     boolean register(RegisterUserInfo registerUserInfo) throws QiniuException;
+
+    void logout();
+
+    UserInfo getCurrentUser() throws QiniuException;
 }

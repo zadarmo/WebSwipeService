@@ -7,6 +7,7 @@ import com.example.webswipeservice.mapper.user.UserInfoMapper;
 import com.example.webswipeservice.modal.user.IUserDetails;
 import com.example.webswipeservice.modal.user.UserInfo;
 import com.example.webswipeservice.modal.user.controller.RegisterUserInfo;
+import com.example.webswipeservice.modal.user.controller.UserInfoHolder;
 import com.example.webswipeservice.network.ResultUtils;
 import com.example.webswipeservice.service.user.UserInfoService;
 import com.example.webswipeservice.tools.JwtUtil;
@@ -29,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.net.URLEncoder;
 import java.util.HashMap;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -48,6 +50,9 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo> i
     UserInfoMapper userInfoMapper;
     @Autowired
     UserDetailsService userDetailsService;
+
+    @Value("${qly-expireInSeconds}")
+    long expireInSeconds;
 
     @Autowired
     PasswordEncoder passwordEncoder;  // 用来对用户密码加密
@@ -102,6 +107,25 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo> i
             return true;
         } else {
             return false;
+        }
+    }
+
+    @Override
+    public void logout() {
+        UserInfo userInfo = UserInfoHolder.getUserInfo();
+        redisCache.deleteObject("userId:"+ userInfo.getId());
+    }
+
+    @Override
+    public UserInfo getCurrentUser() throws QiniuException {
+        UserInfo userInfo = UserInfoHolder.getUserInfo();
+        if (Objects.isNull(userInfo)) {
+            return null;
+        } else {
+            String avatarUrl = QlyTool.buildQlySrcUrl(avatarDomain, false, userInfo.getAvatarKey(),
+                    expireInSeconds, accessKey, secretKey);
+            userInfo.setAvatarUrl(avatarUrl);
+            return userInfo;
         }
     }
 }

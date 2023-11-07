@@ -7,6 +7,7 @@ import com.example.webswipeservice.mapper.userinteraction.UserInteractionMapper;
 import com.example.webswipeservice.mapper.video.CategoryInfoMapper;
 import com.example.webswipeservice.mapper.video.VideoInfoMapper;
 import com.example.webswipeservice.modal.user.UserInfo;
+import com.example.webswipeservice.modal.user.controller.UserInfoHolder;
 import com.example.webswipeservice.modal.userinteraction.UserInteraction;
 import com.example.webswipeservice.modal.video.CategoryInfo;
 import com.example.webswipeservice.modal.video.UploadedVideo;
@@ -162,37 +163,47 @@ public class VideoInfoServiceImpl implements VideoInfoService {
     }
 
     @Override
-    public List<VideoInfo> selectByUserId(long id) {
-        LambdaQueryWrapper<VideoInfo> lambdaQueryWrapper = new LambdaQueryWrapper<>();
-        lambdaQueryWrapper.eq(VideoInfo::getUploaderId, id);
-        return videoMapper.selectList(lambdaQueryWrapper);
+    public List<VideoInfo> selectByUserId() {
+        UserInfo userInfo = UserInfoHolder.getUserInfo();
+        if (Objects.isNull(userInfo)) {
+            return null;
+        } else {
+            LambdaQueryWrapper<VideoInfo> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+            lambdaQueryWrapper.eq(VideoInfo::getUploaderId, userInfo.getId());
+            return videoMapper.selectList(lambdaQueryWrapper);
+        }
     }
 
     @Override
-    public List<VideoInfo> selectInteractionVideo(long userId, String interactionType) {
-        // 1. 在user_interaction表中获取用户id为userId互动为InteractionType的视频id
-        LambdaQueryWrapper<UserInteraction> lambdaQueryWrapper = new LambdaQueryWrapper<>();
-        lambdaQueryWrapper
-                .eq(UserInteraction::getUserId, userId)
-                .eq(UserInteraction::getInteractionType, interactionType);
-        List<UserInteraction> userInteractions = userInteractionMapper.selectList(lambdaQueryWrapper);
+    public List<VideoInfo> selectInteractionVideo(String interactionType) {
+        UserInfo userInfo = UserInfoHolder.getUserInfo();
+        if (Objects.isNull(userInfo)) {
+            return null;
+        } else {
+            // 1. 在user_interaction表中获取用户id为userId互动为InteractionType的视频id
+            LambdaQueryWrapper<UserInteraction> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+            lambdaQueryWrapper
+                    .eq(UserInteraction::getUserId, userInfo.getId())
+                    .eq(UserInteraction::getInteractionType, interactionType);
+            List<UserInteraction> userInteractions = userInteractionMapper.selectList(lambdaQueryWrapper);
 
-        // 2. 根据视频id，查询视频的所有信息
-        if (!userInteractions.isEmpty()) {
-            // Extract video_id values from the result
-            List<Long> videoIds = userInteractions.stream()
-                    .map(UserInteraction::getVideoId)
-                    .collect(Collectors.toList());
+            // 2. 根据视频id，查询视频的所有信息
+            if (!userInteractions.isEmpty()) {
+                // Extract video_id values from the result
+                List<Long> videoIds = userInteractions.stream()
+                        .map(UserInteraction::getVideoId)
+                        .collect(Collectors.toList());
 
-            // Query table2 for video_info using the video_id values
-            LambdaQueryWrapper<VideoInfo> lambdaQueryWrapper2 = new LambdaQueryWrapper<>();
-            lambdaQueryWrapper2.in(VideoInfo::getId, videoIds);
-            List<VideoInfo> videoInfos = videoMapper.selectList(lambdaQueryWrapper2);
-            return videoInfos;
+                // Query table2 for video_info using the video_id values
+                LambdaQueryWrapper<VideoInfo> lambdaQueryWrapper2 = new LambdaQueryWrapper<>();
+                lambdaQueryWrapper2.in(VideoInfo::getId, videoIds);
+                List<VideoInfo> videoInfos = videoMapper.selectList(lambdaQueryWrapper2);
+                return videoInfos;
+            }
+
+            // Handle the case when there are no records in table1
+            return Collections.emptyList();
         }
-
-        // Handle the case when there are no records in table1
-        return Collections.emptyList();
     }
 
     @Override
@@ -203,7 +214,6 @@ public class VideoInfoServiceImpl implements VideoInfoService {
         if (latest) {
             lambdaQueryWrapper.orderByDesc(VideoInfo::getCreateAt);
         }
-        List<VideoInfo> videoInfos = videoMapper.selectList(lambdaQueryWrapper);
-        return videoInfos;
+        return videoMapper.selectList(lambdaQueryWrapper);
     }
 }

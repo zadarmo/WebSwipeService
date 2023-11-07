@@ -101,17 +101,12 @@ public class VideoInfoController {
      */
     @PostMapping("/getuploadvideo")
     public BaseResponse<Object> getUploadVideo() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        UserInfo userInfo = null;
-        try {
-            userInfo = (UserInfo) authentication.getPrincipal();
-        }catch (Exception e){
-            return ResultUtils.success("当前未登录",null);
+        List<VideoInfo> videoInfos = videoService.selectByUserId();
+        if (Objects.isNull(videoInfos)) {
+            return ResultUtils.error(-1, "当前未登录");
+        } else {
+            return ResultUtils.success("success", videoInfos);
         }
-        if(Objects.isNull(userInfo)){
-            return ResultUtils.success("当前未登录",new Object());
-        }
-        return ResultUtils.success("success",videoService.selectByUserId(userInfo.getId()));
     }
 
     /**
@@ -120,17 +115,12 @@ public class VideoInfoController {
      */
     @GetMapping("/getinteractionvideo")
     public BaseResponse<Object> getinteractionvideo(@RequestParam(value="interactionType") String interactionType) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        UserInfo userInfo = null;
-        try {
-            userInfo = (UserInfo) authentication.getPrincipal();
-        }catch (Exception e){
-            return ResultUtils.success("当前未登录",null);
+        List<VideoInfo> videoInfos = videoService.selectInteractionVideo(interactionType);
+        if (Objects.isNull(videoInfos)) {
+            return ResultUtils.error(-1,"当前未登录");
+        } else {
+            return ResultUtils.success("success", videoInfos);
         }
-        if(Objects.isNull(userInfo)){
-            return ResultUtils.success("当前未登录",new Object());
-        }
-        return ResultUtils.success("success",videoService.selectInteractionVideo(userInfo.getId(), interactionType));
     }
 
     /**
