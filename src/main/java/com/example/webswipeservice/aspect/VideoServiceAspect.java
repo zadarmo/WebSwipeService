@@ -9,6 +9,7 @@ import com.example.webswipeservice.modal.user.controller.UserInfoHolder;
 import com.example.webswipeservice.modal.video.VideoInfo;
 import com.example.webswipeservice.tools.QlyTool;
 import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
@@ -18,6 +19,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 @Aspect
@@ -53,6 +56,12 @@ public class VideoServiceAspect {
     @Value("${qly-expireInSeconds}")
     long expireInSeconds;
 
+    /**
+     * 将获取的视频列表进行后处理，包括：构建资源外链，赋值用户名，并按创建时间排序
+     * @param joinPoint
+     * @return
+     * @throws Throwable
+     */
     @Around("execution(* com.example.webswipeservice.service.video.VideoInfoService.list(..))" +
             "|| execution(* com.example.webswipeservice.service.video.VideoInfoService.search(..))" +
             "|| execution(* com.example.webswipeservice.service.video.VideoInfoService.selectInteractionVideo(..)) " +
@@ -72,6 +81,9 @@ public class VideoServiceAspect {
             UserInfo userInfo = userInfoMapper.selectById(videoInfo.getUploaderId());
             videoInfo.setUsername(userInfo.getUsername());
         }
+
+        // 按创建时间排序
+        videoInfos.sort(Comparator.comparing(VideoInfo::getCreateAt).reversed());
 
         return videoInfos;
     }
