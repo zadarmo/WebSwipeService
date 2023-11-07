@@ -28,3 +28,5 @@ qly-buckets:
 
 qly-pipelines:
   cover: video-cover
+
+qly-expireInSeconds: 3600

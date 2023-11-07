@@ -61,9 +61,11 @@ public class VideoInfoServiceImpl implements VideoInfoService {
     @Value("${qly-pipelines.cover}")
     String coverPipeline;
 
+    @Value("qly-expireInSeconds")
+    long expireInSeconds;
+
     @Override
     public String download(String key) throws QiniuException {
-        long expireInSeconds = 3600;
         return QlyTool.buildQlySrcUrl(videoDomain, false, key, expireInSeconds, accessKey, secretKey);
     }
 
@@ -94,8 +96,6 @@ public class VideoInfoServiceImpl implements VideoInfoService {
     }
 
     public List<VideoInfo> list(String category) throws QiniuException {
-        long expireInSeconds = 3600;
-
         // 从数据库中查询满足tags字段包含tag的数据
         QueryWrapper<VideoInfo> queryMapper = new QueryWrapper<>();
         queryMapper.like("categories", category);
@@ -215,7 +215,6 @@ public class VideoInfoServiceImpl implements VideoInfoService {
         List<VideoInfo> videoInfos = videoMapper.selectList(lambdaQueryWrapper);
 
         // 构建资源外链
-        long expireInSeconds = 3600;
         for (VideoInfo videoInfo : videoInfos) {
             String videoUrl = QlyTool.buildQlySrcUrl(videoDomain, false, videoInfo.getVideoKey(), expireInSeconds, accessKey, secretKey);
             String coverUrl = QlyTool.buildQlySrcUrl(coverDomain, false, videoInfo.getCoverKey(), expireInSeconds, accessKey, secretKey);
